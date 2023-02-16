@@ -1,97 +1,63 @@
+//Packages
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+//Screens
+import 'screens/home_screen.dart';
+
+//Consts
+import 'consts/theme_data.dart';
+
+//Providers
+import 'providers/theme_provider.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
+  State<MyApp> createState() => _MyAppState();
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+class _MyAppState extends State<MyApp> {
+  //Need it to access the theme Provider
+  ThemeProvider themeChangeProvider = ThemeProvider();
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  void initState() {
+    getCurrentAppTheme();
+    super.initState();
   }
 
-  void _decrementCounter() {
-    setState(() {
-      if (_counter == 0) {
-        return;
-      } else {
-        _counter--;
-      }
-    });
+  //Fetch the current theme
+  void getCurrentAppTheme() async {
+    themeChangeProvider.setDarkTheme =
+        await themeChangeProvider.darkThemePreferences.getTheme();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    _incrementCounter();
-                  },
-                  icon: const Icon(Icons.plus_one),
-                ),
-                IconButton(
-                  onPressed: () {
-                    _decrementCounter();
-                  },
-                  icon: const Icon(Icons.delete),
-                ),
-              ],
-            )
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) {
+          //Notify about theme changes
+          return themeChangeProvider;
+        }),
+      ],
+      child:
+          //Notify about theme changes
+          Consumer<ThemeProvider>(builder: (context, themeChangeProvider, ch) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Blog',
+          theme: Styles.themeData(themeChangeProvider.getDarkTheme, context),
+          home: const HomeScreen(),
+          routes: {},
+        );
+      }),
     );
   }
 }
