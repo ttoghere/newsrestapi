@@ -18,11 +18,17 @@ class Styles {
             bodyColor: isDarkTheme ? Colors.white : Colors.black,
             displayColor: isDarkTheme ? Colors.white : Colors.black,
           ),
-      cardColor: isDarkTheme ? darkCardColor : lightCardColor,
-      brightness: isDarkTheme ? Brightness.dark : Brightness.light, colorScheme: ThemeData().colorScheme.copyWith(
+      cardColor: isDarkTheme ? lightCardColor : darkCardColor,
+      brightness: isDarkTheme ? Brightness.dark : Brightness.light,
+      colorScheme: ThemeData()
+          .colorScheme
+          .copyWith(
             secondary: isDarkTheme ? darkIconsColor : lightIconsColor,
             brightness: isDarkTheme ? Brightness.dark : Brightness.light,
-          ).copyWith(background: isDarkTheme ? darkBackgroundColor : lightBackgroundColor),
+          )
+          .copyWith(
+              background:
+                  isDarkTheme ? darkBackgroundColor : lightBackgroundColor),
     );
   }
 }
