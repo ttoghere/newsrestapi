@@ -1,19 +1,22 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:newsrestapi/consts/utils.dart';
 import 'package:page_transition/page_transition.dart';
-import '../inner_screens/blog_details.dart';
+import 'package:newsrestapi/consts/utils.dart';
 import '../inner_screens/news_details_webview.dart';
 
 class TopTrendingWidget extends StatelessWidget {
-  const TopTrendingWidget({Key? key}) : super(key: key);
+  final String url;
+  const TopTrendingWidget({
+    Key? key,
+    required this.url,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final Utils utils = Utils(context: context);
-    final size =utils.getScreenSize;
-    final Color color =utils.getColor;
+    final size = utils.getScreenSize;
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Material(
@@ -21,11 +24,13 @@ class TopTrendingWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.0),
         child: InkWell(
           onTap: () {
-            Navigator.pushNamed(context, NewsDetailsScreen.routeName);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => NewsDetailsWebView(url: url)));
           },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            // mainAxisAlignment: MainAxisAlignment.start,
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
@@ -38,11 +43,14 @@ class TopTrendingWidget extends StatelessWidget {
                   width: double.infinity,
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.all(8.0),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: Text(
                   'Title',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      color: Theme.of(context).colorScheme.secondary),
                 ),
               ),
               Row(
@@ -53,19 +61,21 @@ class TopTrendingWidget extends StatelessWidget {
                           context,
                           PageTransition(
                               type: PageTransitionType.rightToLeft,
-                              child: const NewsDetailsWebView(),
+                              child: NewsDetailsWebView(
+                                url: url,
+                              ),
                               inheritTheme: true,
                               ctx: context),
                         );
                       },
-                      icon: Icon(
-                        Icons.link,
-                        color: color,
-                      )),
+                      icon: Icon(Icons.link,
+                          color: Theme.of(context).colorScheme.secondary)),
                   const Spacer(),
                   SelectableText(
                     "20-20-2022",
-                    style: GoogleFonts.montserrat(fontSize: 15),
+                    style: GoogleFonts.montserrat(
+                        fontSize: 15,
+                        color: Theme.of(context).colorScheme.secondary),
                   ),
                 ],
               ),

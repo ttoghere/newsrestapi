@@ -1,13 +1,13 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
-import 'dart:developer';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
 import 'package:newsrestapi/inner_screens/search_screen.dart';
+import 'package:newsrestapi/services/models/news_model.dart';
+import 'package:newsrestapi/services/news_api.dart';
 import 'package:newsrestapi/widgets/articles_widget.dart';
+import 'package:newsrestapi/widgets/empty_screen.dart';
+import 'package:newsrestapi/widgets/loading_widget.dart';
 import 'package:newsrestapi/widgets/tabs.dart';
 import 'package:newsrestapi/consts/utils.dart';
 import 'package:newsrestapi/consts/vars.dart';
@@ -27,15 +27,16 @@ class _HomeScreenState extends State<HomeScreen> {
   var newsType = NewsType.allNews;
   int currentPageIndex = 0;
   String sortBy = SortByEnum.publishedAt.name;
-  Future<void> getNews() async {
-    var response = await http.get(
-      Uri.parse(
-        "https://newsapi.org/v2/everything?q=bitcoin&apiKey=76bc51b821da431083aa276ccc5a0078",
-      ),
-    );
-    log("Response StatusCode:  ${response.statusCode}");
-    log("---" * 10);
-    log("Response body: ${jsonDecode(response.body)}}");
+  List<NewsModel> newsList = [];
+  @override
+  void initState() {
+    getNewsList();
+    super.initState();
+  }
+
+  Future<List<NewsModel>> getNewsList() async {
+    newsList = await NewsApiServices.getAllNews();
+    return newsList;
   }
 
   @override
@@ -67,7 +68,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       inheritTheme: true,
                       ctx: context),
                 );
-                await getNews();
               },
               icon: const Icon(
                 IconlyLight.search,
@@ -205,29 +205,55 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-            if (newsType == NewsType.allNews)
-              Expanded(
-                child: ListView.builder(
-                    itemCount: 20,
-                    itemBuilder: (ctx, index) {
-                      return const ArticlesWidget();
-                    }),
-              ),
-            if (newsType == NewsType.topTrending)
-              SizedBox(
-                height: size.height * 0.6,
-                child: Swiper(
-                  autoplayDelay: 8000,
-                  autoplay: true,
-                  itemWidth: size.width * 0.9,
-                  layout: SwiperLayout.STACK,
-                  viewportFraction: 0.9,
-                  itemCount: 5,
-                  itemBuilder: (context, index) {
-                    return const TopTrendingWidget();
-                  },
-                ),
-              ),
+            FutureBuilder<List<NewsModel>>(
+                future: getNewsList(),
+                builder: (context, snap) {
+                  if (snap.connectionState == ConnectionState.waiting) {
+                    return newsType == NewsType.allNews
+                        ? LoadingWidget(newsType: newsType)
+                        : Expanded(child: LoadingWidget(newsType: newsType));
+                  } else if (snap.hasError) {
+                    return EmptyNewsWidget(
+                        text: "An Error Occured: ${snap.hasError}",
+                        imagePath: "assets/images/no_news.png");
+                  } else if (snap.data == null) {
+                    return EmptyNewsWidget(
+                      text: "An Error Occured: ${snap.hasError}",
+                      imagePath: "assets/images/no_news.png",
+                    );
+                  }
+                  return newsType == NewsType.allNews
+                      ? Expanded(
+                          child: ListView.builder(
+                              itemCount: snap.data!.length,
+                              itemBuilder: (ctx, index) {
+                                NewsModel access = snap.data![index];
+                                return ArticlesWidget(
+                                  imageUrl: access.urlToImage,
+                                  url: access.url,
+                                  dateToShow: access.dateToShow,
+                                  title: access.title,
+                                  readingTime: access.readingTimeText,
+                                );
+                              }),
+                        )
+                      : SizedBox(
+                          height: size.height * 0.6,
+                          child: Swiper(
+                            autoplayDelay: 8000,
+                            autoplay: true,
+                            itemWidth: size.width * 0.9,
+                            layout: SwiperLayout.STACK,
+                            viewportFraction: 0.9,
+                            itemCount: 5,
+                            itemBuilder: (context, index) {
+                              return TopTrendingWidget(
+                                url: snap.data![index].url,
+                              );
+                            },
+                          ),
+                        );
+                }),
           ]),
         ),
       ),

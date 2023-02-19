@@ -1,15 +1,22 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
-import 'package:newsrestapi/consts/utils.dart';
-import 'package:newsrestapi/services/global_methods.dart';
-import 'package:newsrestapi/widgets/vertical_spacing.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import 'package:newsrestapi/consts/utils.dart';
+import 'package:newsrestapi/services/global_methods.dart';
+import 'package:newsrestapi/widgets/vertical_spacing.dart';
+
 class NewsDetailsWebView extends StatefulWidget {
-  const NewsDetailsWebView({Key? key}) : super(key: key);
+  const NewsDetailsWebView({
+    Key? key,
+    required this.url,
+  }) : super(key: key);
+  final String url;
 
   @override
   State<NewsDetailsWebView> createState() => _NewsDetailsWebViewState();
@@ -19,8 +26,7 @@ class _NewsDetailsWebViewState extends State<NewsDetailsWebView> {
   late WebViewController _webViewController;
 
   double _progress = 0.0;
-  final url =
-      "https://techcrunch.com/2022/06/17/marc-lores-food-delivery-startup-wonder-raises-350m-3-5b-valuation/";
+
   @override
   Widget build(BuildContext context) {
     var utils = Utils(context: context);
@@ -47,7 +53,7 @@ class _NewsDetailsWebViewState extends State<NewsDetailsWebView> {
             elevation: 0,
             centerTitle: true,
             title: Text(
-              "URL",
+              widget.url,
               style: TextStyle(color: color),
             ),
             actions: [
@@ -69,7 +75,7 @@ class _NewsDetailsWebViewState extends State<NewsDetailsWebView> {
             ),
             Expanded(
               child: WebView(
-                initialUrl: url,
+                initialUrl: widget.url,
                 zoomEnabled: true,
                 onProgress: (progress) {
                   setState(() {
@@ -117,22 +123,36 @@ class _NewsDetailsWebViewState extends State<NewsDetailsWebView> {
                     ),
                   ),
                 ),
-                const VerticalSpacing(20),
-                const Text(
+                Text(
                   'More option',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 20,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
                 ),
-                const VerticalSpacing(20),
-                const Divider(
-                  thickness: 2,
+                Divider(
+                  thickness: 5,
+                  color: Theme.of(context).colorScheme.secondary,
                 ),
-                const VerticalSpacing(20),
                 ListTile(
-                  leading: const Icon(Icons.share),
-                  title: const Text('Share'),
+                  leading: Icon(
+                    Icons.share,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                  title: Text(
+                    'Share',
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .secondary
+                              .withOpacity(0.7),
+                        ),
+                  ),
                   onTap: () async {
                     try {
-                      await Share.share('url', subject: 'Look what I made!');
+                      await Share.share(widget.url,
+                          subject: 'Look what I made!');
                     } catch (err) {
                       GlobalMethods.errorDialog(
                           errorMessage: err.toString(), context: context);
@@ -140,17 +160,39 @@ class _NewsDetailsWebViewState extends State<NewsDetailsWebView> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.open_in_browser),
-                  title: const Text('Open in browser'),
+                  leading: Icon(
+                    Icons.open_in_browser,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                  title: Text(
+                    'Open in browser',
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .secondary
+                              .withOpacity(0.7),
+                        ),
+                  ),
                   onTap: () async {
-                    if (!await launchUrl(Uri.parse(url))) {
-                      throw 'Could not launch $url';
+                    if (!await launchUrl(Uri.parse(widget.url))) {
+                      throw 'Could not launch ${widget.url}';
                     }
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.refresh),
-                  title: const Text('Refresh'),
+                  leading: Icon(
+                    Icons.refresh,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                  title: Text(
+                    'Refresh',
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .secondary
+                              .withOpacity(0.7),
+                        ),
+                  ),
                   onTap: () async {
                     try {
                       await _webViewController.reload();
