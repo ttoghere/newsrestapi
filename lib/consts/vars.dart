@@ -20,3 +20,5 @@ enum SortByEnum {
   popularity, // articles from popular sources and publishers come first.
   publishedAt, // newest articles come first.
 }
+
+String apiKey = "76bc51b821da431083aa276ccc5a0078";
