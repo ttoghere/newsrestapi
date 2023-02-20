@@ -83,7 +83,7 @@ class ArticlesWidget extends StatelessWidget {
                         children: [
                           Text(
                             title,
-                            textAlign: TextAlign.justify,
+                            textAlign: TextAlign.center,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: utils.smallTextStyle.copyWith(
@@ -106,6 +106,7 @@ class ArticlesWidget extends StatelessWidget {
                           ),
                           FittedBox(
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 IconButton(
                                   onPressed: () {

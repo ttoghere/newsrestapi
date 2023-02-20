@@ -28,16 +28,16 @@ class _HomeScreenState extends State<HomeScreen> {
   int currentPageIndex = 0;
   String sortBy = SortByEnum.publishedAt.name;
   List<NewsModel> newsList = [];
-  @override
-  void initState() {
-    getNewsList();
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   getNewsList();
+  //   super.initState();
+  // }
 
-  Future<List<NewsModel>> getNewsList() async {
-    newsList = await NewsApiServices.getAllNews();
-    return newsList;
-  }
+  // Future<List<NewsModel>> getNewsList() async {
+  //   newsList = await NewsApiServices.getAllNews();
+  //   return newsList;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -206,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
             FutureBuilder<List<NewsModel>>(
-                future: getNewsList(),
+                future: NewsApiServices.getAllNews(),
                 builder: (context, snap) {
                   if (snap.connectionState == ConnectionState.waiting) {
                     return newsType == NewsType.allNews
@@ -247,8 +247,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             viewportFraction: 0.9,
                             itemCount: 5,
                             itemBuilder: (context, index) {
+                              var access = snap.data![index];
                               return TopTrendingWidget(
-                                url: snap.data![index].url,
+                                url: access.url,
+                                image: access.urlToImage,
+                                title: access.title,
                               );
                             },
                           ),

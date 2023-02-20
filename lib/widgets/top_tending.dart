@@ -3,13 +3,19 @@ import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
+
 import 'package:newsrestapi/consts/utils.dart';
+
 import '../inner_screens/news_details_webview.dart';
 
 class TopTrendingWidget extends StatelessWidget {
+  final String title;
+  final String image;
   final String url;
   const TopTrendingWidget({
     Key? key,
+    required this.title,
+    required this.image,
     required this.url,
   }) : super(key: key);
 
@@ -38,7 +44,7 @@ class TopTrendingWidget extends StatelessWidget {
                   boxFit: BoxFit.fill,
                   errorWidget: Image.asset('assets/images/empty_image.png'),
                   imageUrl:
-                      "https://techcrunch.com/wp-content/uploads/2022/01/locket-app.jpg?w=1390&crop=1",
+                     image,
                   height: size.height * 0.33,
                   width: double.infinity,
                 ),
@@ -46,7 +52,7 @@ class TopTrendingWidget extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  'Title',
+                  title,
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 24,
