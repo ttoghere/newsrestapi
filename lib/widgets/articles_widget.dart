@@ -1,6 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter/material.dart';
+import 'package:newsrestapi/providers/news_provider.dart';
+import 'package:newsrestapi/services/models/news_model.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:newsrestapi/consts/utils.dart';
@@ -9,25 +11,12 @@ import 'package:newsrestapi/providers/theme_provider.dart';
 import 'vertical_spacing.dart';
 
 class ArticlesWidget extends StatelessWidget {
-  const ArticlesWidget({
-    Key? key,
-    required this.title,
-    required this.imageUrl,
-    required this.url,
-    required this.dateToShow,
-    required this.readingTime,
-  }) : super(key: key);
-  final String title;
-  final String imageUrl;
-  final String url;
-  final String dateToShow;
-  final String readingTime;
 
   @override
   Widget build(BuildContext context) {
     var themeProvider = Provider.of<ThemeProvider>(context);
     var utils = Utils(context: context);
-
+    var newsProvider = context.read<NewsModel>();
     Size size = utils.getScreenSize;
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -37,7 +26,7 @@ class ArticlesWidget extends StatelessWidget {
           onTap: () {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => NewsDetailsWebView(
-                      url: url,
+                      url: newsProvider.url,
                     )));
           },
           child: Stack(
@@ -63,16 +52,15 @@ class ArticlesWidget extends StatelessWidget {
                 child: Row(
                   children: [
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: FancyShimmerImage(
-                        height: size.height * 0.12,
-                        width: size.height * 0.12,
-                        boxFit: BoxFit.fill,
-                        errorWidget:
-                            Image.asset('assets/images/empty_image.png'),
-                        imageUrl: imageUrl,
-                      ),
-                    ),
+                        borderRadius: BorderRadius.circular(10),
+                        child: FancyShimmerImage(
+                          height: size.height * 0.12,
+                          width: size.height * 0.12,
+                          boxFit: BoxFit.fill,
+                          errorWidget:
+                              Image.asset('assets/images/empty_image.png'),
+                          imageUrl: newsProvider.urlToImage,
+                        )),
                     const SizedBox(
                       width: 10,
                     ),
@@ -82,7 +70,7 @@ class ArticlesWidget extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text(
-                            title,
+                            newsProvider.title,
                             textAlign: TextAlign.center,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -96,7 +84,7 @@ class ArticlesWidget extends StatelessWidget {
                           Align(
                             alignment: Alignment.topRight,
                             child: Text(
-                              '🕒 $readingTime',
+                              '🕒 ${newsProvider.readingTimeText}',
                               style: utils.smallTextStyle.copyWith(
                                 color: themeProvider.getDarkTheme
                                     ? Colors.black
@@ -115,7 +103,7 @@ class ArticlesWidget extends StatelessWidget {
                                       PageTransition(
                                           type: PageTransitionType.rightToLeft,
                                           child: NewsDetailsWebView(
-                                            url: url,
+                                            url: newsProvider.url,
                                           ),
                                           inheritTheme: true,
                                           ctx: context),
@@ -131,7 +119,7 @@ class ArticlesWidget extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  dateToShow,
+                                  newsProvider.dateToShow,
                                   maxLines: 1,
                                   style: utils.smallTextStyle.copyWith(
                                     color: themeProvider.getDarkTheme

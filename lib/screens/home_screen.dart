@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:newsrestapi/inner_screens/search_screen.dart';
+import 'package:newsrestapi/providers/news_provider.dart';
 import 'package:newsrestapi/services/models/news_model.dart';
 import 'package:newsrestapi/services/news_api.dart';
 import 'package:newsrestapi/widgets/articles_widget.dart';
@@ -15,6 +16,7 @@ import 'package:newsrestapi/widgets/drawer_widget.dart';
 import 'package:newsrestapi/widgets/top_tending.dart';
 import 'package:newsrestapi/widgets/vertical_spacing.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -27,22 +29,12 @@ class _HomeScreenState extends State<HomeScreen> {
   var newsType = NewsType.allNews;
   int currentPageIndex = 0;
   String sortBy = SortByEnum.publishedAt.name;
-  List<NewsModel> newsList = [];
-  // @override
-  // void initState() {
-  //   getNewsList();
-  //   super.initState();
-  // }
-
-  // Future<List<NewsModel>> getNewsList() async {
-  //   newsList = await NewsApiServices.getAllNews();
-  //   return newsList;
-  // }
 
   @override
   Widget build(BuildContext context) {
     final Utils utils = Utils(context: context);
     Size size = utils.getScreenSize;
+    final newsProvider = Provider.of<NewsProvider>(context);
     final Color color = utils.getColor;
     return SafeArea(
       child: Scaffold(
@@ -206,7 +198,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
             FutureBuilder<List<NewsModel>>(
-                future: NewsApiServices.getAllNews(),
+                future:
+                    newsProvider.fetchAllNews(pageIndex: currentPageIndex + 1),
                 builder: (context, snap) {
                   if (snap.connectionState == ConnectionState.waiting) {
                     return newsType == NewsType.allNews
@@ -227,13 +220,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: ListView.builder(
                               itemCount: snap.data!.length,
                               itemBuilder: (ctx, index) {
-                                NewsModel access = snap.data![index];
-                                return ArticlesWidget(
-                                  imageUrl: access.urlToImage,
-                                  url: access.url,
-                                  dateToShow: access.dateToShow,
-                                  title: access.title,
-                                  readingTime: access.readingTimeText,
+                                return ChangeNotifierProvider.value(
+                                  value: snap.data![index],
+                                  child: ArticlesWidget(),
                                 );
                               }),
                         )

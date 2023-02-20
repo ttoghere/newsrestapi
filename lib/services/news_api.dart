@@ -5,10 +5,14 @@ import 'package:newsrestapi/consts/vars.dart';
 import 'package:newsrestapi/services/models/news_model.dart';
 
 class NewsApiServices {
-  static Future<List<NewsModel>> getAllNews() async {
+  static Future<List<NewsModel>> getAllNews({required int page}) async {
     try {
-      var uri = Uri.https(baseUrl, "v2/everything",
-          {"q": "bitcoin", "pageSize": "5", "domains": "techcrunch.com"});
+      var uri = Uri.https(baseUrl, "v2/everything", {
+        "q": "bitcoin",
+        "pageSize": "5",
+        "domains": "techcrunch.com",
+        "page": page.toString(),
+      });
       var response = await http.get(
         uri,
         headers: {
