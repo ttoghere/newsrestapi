@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter/material.dart';
+import 'package:newsrestapi/inner_screens/blog_details.dart';
 import 'package:newsrestapi/providers/news_provider.dart';
 import 'package:newsrestapi/services/models/news_model.dart';
 import 'package:page_transition/page_transition.dart';
@@ -11,7 +12,6 @@ import 'package:newsrestapi/providers/theme_provider.dart';
 import 'vertical_spacing.dart';
 
 class ArticlesWidget extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     var themeProvider = Provider.of<ThemeProvider>(context);
@@ -24,10 +24,8 @@ class ArticlesWidget extends StatelessWidget {
         color: Theme.of(context).cardColor,
         child: GestureDetector(
           onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => NewsDetailsWebView(
-                      url: newsProvider.url,
-                    )));
+            Navigator.of(context).pushNamed(NewsDetailsScreen.routeName,
+                arguments: newsProvider.publishedAt);
           },
           child: Stack(
             children: [

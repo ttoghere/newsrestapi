@@ -193,13 +193,21 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: DropdownButton(
                             value: sortBy,
                             items: dropDownItems,
-                            onChanged: (String? value) {}),
+                            onChanged: (String? value) {
+                              setState(() {
+                                sortBy = value!;
+                              });
+                            }),
                       ),
                     ),
                   ),
             FutureBuilder<List<NewsModel>>(
-                future:
-                    newsProvider.fetchAllNews(pageIndex: currentPageIndex + 1),
+                future: newsType == NewsType.topTrending
+                    ? newsProvider.fetchTopHeadlines()
+                    : newsProvider.fetchAllNews(
+                        pageIndex: currentPageIndex + 1,
+                        sortBy: sortBy,
+                      ),
                 builder: (context, snap) {
                   if (snap.connectionState == ConnectionState.waiting) {
                     return newsType == NewsType.allNews
@@ -237,10 +245,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             itemCount: 5,
                             itemBuilder: (context, index) {
                               var access = snap.data![index];
-                              return TopTrendingWidget(
-                                url: access.url,
-                                image: access.urlToImage,
-                                title: access.title,
+                              return ChangeNotifierProvider.value(
+                                value: access,
+                                child: TopTrendingWidget(),
                               );
                             },
                           ),

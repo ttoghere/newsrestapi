@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:newsrestapi/consts/utils.dart';
+import 'package:newsrestapi/providers/news_provider.dart';
+import 'package:newsrestapi/services/global_methods.dart';
 import 'package:newsrestapi/widgets/vertical_spacing.dart';
+import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class NewsDetailsScreen extends StatefulWidget {
   static const routeName = "/NewsDetailsScreen";
@@ -18,7 +22,9 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
   Widget build(BuildContext context) {
     final utils = Utils(context: context);
     final color = utils.getColor;
-
+    final newsProvider = Provider.of<NewsProvider>(context);
+    final publishedAt = ModalRoute.of(context)!.settings.arguments as String;
+    final findByDate = newsProvider.findByDate(publishedAt: publishedAt);
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: color),
@@ -26,7 +32,7 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         centerTitle: true,
         title: Text(
-          "By Author",
+          findByDate.authorName,
           textAlign: TextAlign.center,
           style: TextStyle(color: color),
         ),
@@ -39,20 +45,20 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Title" * 10,
-                  textAlign: TextAlign.justify,
+                  findByDate.title,
+                  textAlign: TextAlign.center,
                   style: utils.titleTextStyle,
                 ),
                 const VerticalSpacing(25),
                 Row(
                   children: [
                     Text(
-                      "20/20/2015",
+                      findByDate.publishedAt,
                       style: utils.smallTextStyle,
                     ),
                     const Spacer(),
                     Text(
-                      "readingTimeText",
+                      findByDate.readingTimeText,
                       style: utils.smallTextStyle,
                     ),
                   ],
@@ -70,8 +76,7 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
                   child: FancyShimmerImage(
                     boxFit: BoxFit.fill,
                     errorWidget: Image.asset('assets/images/empty_image.png'),
-                    imageUrl:
-                        "https://techcrunch.com/wp-content/uploads/2022/01/locket-app.jpg?w=1390&crop=1",
+                    imageUrl: findByDate.urlToImage,
                   ),
                 ),
               ),
@@ -83,7 +88,15 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
                   child: Row(
                     children: [
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () async {
+                          try {
+                            await Share.share(findByDate.url);
+                          } catch (error) {
+                            GlobalMethods.errorDialog(
+                                errorMessage: error.toString(),
+                                context: context);
+                          }
+                        },
                         child: Card(
                           elevation: 10,
                           shape: const CircleBorder(),
@@ -92,7 +105,7 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
                             child: Icon(
                               IconlyLight.send,
                               size: 28,
-                              color: color,
+                              color: Theme.of(context).colorScheme.secondary,
                             ),
                           ),
                         ),
@@ -107,7 +120,7 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
                             child: Icon(
                               IconlyLight.bookmark,
                               size: 28,
-                              color: color,
+                              color: Theme.of(context).colorScheme.secondary,
                             ),
                           ),
                         ),
@@ -131,7 +144,7 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
                 ),
                 const VerticalSpacing(10),
                 TextContent(
-                  label: "description " * 12,
+                  label: findByDate.description,
                   fontSize: 18,
                   fontWeight: FontWeight.normal,
                 ),
@@ -147,7 +160,7 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
                   10,
                 ),
                 TextContent(
-                  label: "content " * 12,
+                  label: findByDate.content,
                   fontSize: 18,
                   fontWeight: FontWeight.normal,
                 ),
