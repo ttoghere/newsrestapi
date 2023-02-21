@@ -1,6 +1,7 @@
 //Packages
 import 'package:flutter/material.dart';
 import 'package:newsrestapi/inner_screens/blog_details.dart';
+import 'package:newsrestapi/providers/bookmarks_provider.dart';
 import 'package:newsrestapi/providers/news_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -45,10 +46,17 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) {
-          //Notify about theme changes
+        //This provider is for notify about theme changes
           return themeChangeProvider;
         }),
-        ChangeNotifierProvider(create: (_)=>NewsProvider(),),
+        //This provider is for the news actions
+        ChangeNotifierProvider(
+          create: (_) => NewsProvider(),
+        ),
+        //This provider is for the bookmark actions
+        ChangeNotifierProvider(
+          create: (_) => BookmarksProvider(),
+        ),
       ],
       child:
           //Notify about theme changes

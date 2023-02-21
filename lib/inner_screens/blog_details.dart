@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:newsrestapi/consts/utils.dart';
+import 'package:newsrestapi/providers/bookmarks_provider.dart';
 import 'package:newsrestapi/providers/news_provider.dart';
 import 'package:newsrestapi/services/global_methods.dart';
 import 'package:newsrestapi/widgets/vertical_spacing.dart';
@@ -25,6 +26,7 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
     final newsProvider = Provider.of<NewsProvider>(context);
     final publishedAt = ModalRoute.of(context)!.settings.arguments as String;
     final findByDate = newsProvider.findByDate(publishedAt: publishedAt);
+    final bookmarkProvider = Provider.of<BookmarksProvider>(context);
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: color),
@@ -114,7 +116,9 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () async {
+                          await bookmarkProvider.addToBookmark();
+                        },
                         child: Card(
                           elevation: 10,
                           shape: const CircleBorder(),
