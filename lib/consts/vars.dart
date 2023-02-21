@@ -23,3 +23,5 @@ enum SortByEnum {
 
 String apiKey = "76bc51b821da431083aa276ccc5a0078";
 String baseUrl = "newsapi.org";
+String fBaseUrl =
+    "newsapp-618ad-default-rtdb.europe-west1.firebasedatabase.app";
