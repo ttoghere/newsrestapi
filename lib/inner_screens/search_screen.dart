@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:newsrestapi/consts/utils.dart';
+import 'package:newsrestapi/providers/news_provider.dart';
+import 'package:newsrestapi/services/models/news_model.dart';
+import 'package:newsrestapi/widgets/articles_widget.dart';
 import 'package:newsrestapi/widgets/vertical_spacing.dart';
+import 'package:provider/provider.dart';
 import '../consts/vars.dart';
 import '../widgets/empty_screen.dart';
 
@@ -32,10 +36,13 @@ class _SearchScreenState extends State<SearchScreen> {
     super.dispose();
   }
 
+  List<NewsModel>? searchList = [];
+  bool isSearching = false;
+
   @override
   Widget build(BuildContext context) {
     final Utils utils = Utils(context: context);
-    Size size = utils.getScreenSize;
+    var newsProvider = Provider.of<NewsProvider>(context);
     final Color color = utils.getColor;
     return SafeArea(
       child: GestureDetector(
@@ -53,6 +60,8 @@ class _SearchScreenState extends State<SearchScreen> {
                     onTap: () {
                       focusNode.unfocus();
                       Navigator.pop(context);
+                      isSearching = false;
+                      setState(() {});
                     },
                     child: const Icon(
                       IconlyLight.arrowLeft2,
@@ -66,7 +75,14 @@ class _SearchScreenState extends State<SearchScreen> {
                     autofocus: true,
                     textInputAction: TextInputAction.search,
                     keyboardType: TextInputType.text,
-                    onEditingComplete: () {},
+                    onEditingComplete: () async {
+                      searchList = await newsProvider.searchNewsProvider(
+                          query: _searchTextController.text);
+                      focusNode.unfocus();
+                      setState(() {
+                        isSearching = true;
+                      });
+                    },
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.only(
                         bottom: 8 / 5,
@@ -80,7 +96,10 @@ class _SearchScreenState extends State<SearchScreen> {
                           onTap: () {
                             _searchTextController.clear();
                             focusNode.unfocus();
-                            setState(() {});
+                            searchList!.clear();
+                            setState(() {
+                              isSearching = false;
+                            });
                           },
                           child: const Icon(
                             Icons.close,
@@ -95,34 +114,61 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ),
             const VerticalSpacing(10),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: MasonryGridView.count(
-                  itemCount: searchKeywords.length,
-                  crossAxisCount: 4,
-                  mainAxisSpacing: 4,
-                  crossAxisSpacing: 4,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      child: Container(
+            if (!isSearching && searchList!.isEmpty)
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: MasonryGridView.count(
+                    itemCount: searchKeywords.length,
+                    crossAxisCount: 4,
+                    mainAxisSpacing: 4,
+                    crossAxisSpacing: 4,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () async {
+                          _searchTextController.text = searchKeywords[index];
+                          searchList = await newsProvider.searchNewsProvider(
+                              query: _searchTextController.text);
+                          setState(() {
+                            isSearching = true;
+                          });
+                          focusNode.unfocus();
+                        },
+                        child: Container(
                           margin: const EdgeInsets.all(4.0),
                           decoration: BoxDecoration(
                               border: Border.all(color: color),
                               borderRadius: BorderRadius.circular(30)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text(searchKeywords[index]),
-                          )),
-                    );
-                  },
+                            child: Center(
+                                child: FittedBox(
+                                    child: Text(searchKeywords[index]))),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
-            const EmptyNewsWidget(
-              text: "Ops! No resuls found",
-              imagePath: 'assets/images/search.png',
-            ),
+            if (isSearching && searchList!.isEmpty)
+              const Expanded(
+                child: EmptyNewsWidget(
+                  text: "Ops! No resuls found",
+                  imagePath: 'assets/images/search.png',
+                ),
+              ),
+            if (searchList != null && searchList!.isNotEmpty)
+              Expanded(
+                child: ListView.builder(
+                    itemCount: searchList!.length,
+                    itemBuilder: (ctx, index) {
+                      return ChangeNotifierProvider.value(
+                        value: searchList![index],
+                        child: ArticlesWidget(),
+                      );
+                    }),
+              )
           ],
         )),
       ),
