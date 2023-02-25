@@ -186,28 +186,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? Container()
                 : Align(
                     alignment: Alignment.topRight,
-                    child: Material(
-                      color: Theme.of(context).cardColor.withOpacity(0.6),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: DropdownButton(
-                            value: sortBy,
-                            items: dropDownItems,
-                            onChanged: (String? value) {
-                              setState(() {
-                                sortBy = value!;
-                              });
-                            }),
-                      ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: DropdownButton(
+                          value: sortBy,
+                          items: dropDownItems,
+                          onChanged: (String? value) {
+                            setState(() {
+                              sortBy = value!;
+                            });
+                          }),
                     ),
                   ),
             FutureBuilder<List<NewsModel>>(
-                future: newsType == NewsType.topTrending
-                    ? newsProvider.fetchTopHeadlines()
-                    : newsProvider.fetchAllNews(
-                        pageIndex: currentPageIndex + 1,
-                        sortBy: sortBy,
-                      ),
+                future: newsProvider.fetchAllNews(
+                  pageIndex: currentPageIndex + 1,
+                  sortBy: sortBy,
+                ),
                 builder: (context, snap) {
                   if (snap.connectionState == ConnectionState.waiting) {
                     return newsType == NewsType.allNews
@@ -223,35 +218,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       imagePath: "assets/images/no_news.png",
                     );
                   }
-                  return newsType == NewsType.allNews
-                      ? Expanded(
-                          child: ListView.builder(
-                              itemCount: snap.data!.length,
-                              itemBuilder: (ctx, index) {
-                                return ChangeNotifierProvider.value(
-                                  value: snap.data![index],
-                                  child: ArticlesWidget(),
-                                );
-                              }),
-                        )
-                      : SizedBox(
-                          height: size.height * 0.6,
-                          child: Swiper(
-                            autoplayDelay: 8000,
-                            autoplay: true,
-                            itemWidth: size.width * 0.9,
-                            layout: SwiperLayout.STACK,
-                            viewportFraction: 0.9,
-                            itemCount: 5,
-                            itemBuilder: (context, index) {
-                              var access = snap.data![index];
-                              return ChangeNotifierProvider.value(
-                                value: access,
-                                child: TopTrendingWidget(),
-                              );
-                            },
-                          ),
-                        );
+                  return Expanded(
+                    child: ListView.builder(
+                        itemCount: snap.data!.length,
+                        itemBuilder: (ctx, index) {
+                          return ChangeNotifierProvider.value(
+                            value: snap.data![index],
+                            child: ArticlesWidget(),
+                          );
+                        }),
+                  );
                 }),
           ]),
         ),

@@ -3,13 +3,10 @@ import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:newsrestapi/inner_screens/blog_details.dart';
-import 'package:newsrestapi/providers/news_provider.dart';
 import 'package:newsrestapi/services/models/news_model.dart';
 import 'package:page_transition/page_transition.dart';
-
 import 'package:newsrestapi/consts/utils.dart';
 import 'package:provider/provider.dart';
-
 import '../inner_screens/news_details_webview.dart';
 
 class TopTrendingWidget extends StatelessWidget {
@@ -32,6 +29,7 @@ class TopTrendingWidget extends StatelessWidget {
           },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
@@ -49,7 +47,7 @@ class TopTrendingWidget extends StatelessWidget {
                   newsProvider.title,
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 22,
+                      fontSize: 16,
                       color: Theme.of(context).colorScheme.secondary),
                   overflow: TextOverflow.fade,
                 ),
