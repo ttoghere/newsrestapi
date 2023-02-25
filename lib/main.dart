@@ -1,5 +1,6 @@
 //Packages
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:newsrestapi/inner_screens/blog_details.dart';
 import 'package:newsrestapi/providers/bookmarks_provider.dart';
 import 'package:newsrestapi/providers/news_provider.dart';
@@ -15,6 +16,9 @@ import 'consts/theme_data.dart';
 import 'providers/theme_provider.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(const MyApp());
 }
 
@@ -29,11 +33,11 @@ class _MyAppState extends State<MyApp> {
   //Need it to access the theme Provider
   ThemeProvider themeChangeProvider = ThemeProvider();
 
-  @override
-  void initState() {
-    getCurrentAppTheme();
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   getCurrentAppTheme();
+  //   super.initState();
+  // }
 
   //Fetch the current theme
   void getCurrentAppTheme() async {
@@ -46,7 +50,7 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) {
-        //This provider is for notify about theme changes
+          //This provider is for notify about theme changes
           return themeChangeProvider;
         }),
         //This provider is for the news actions
